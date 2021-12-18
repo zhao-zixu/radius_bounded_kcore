@@ -64,7 +64,7 @@ void testRot(){
 }
 int main()
 {
-    testGenSubGraph();
+    //testGenSubGraph();
     testKCore();
     return 0;
 }

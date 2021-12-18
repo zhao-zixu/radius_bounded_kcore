@@ -193,9 +193,6 @@ public:
     int size(){
         return ps.size();
     }
-    vector<Point>& get_points(){
-        return ps;
-    }
     bool include_id(int id){
         return num.count(id)!=0;
     }
@@ -205,6 +202,12 @@ public:
             ids.push_back(p.id);
         }
         return ids;
+    }
+    vector<Point>& get_point_set(){
+        return ps;
+    }
+    vector< vector<int> >& get_edge_set(){
+        return g;
     }
 private:
     int _n;
