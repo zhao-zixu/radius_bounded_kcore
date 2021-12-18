@@ -1,0 +1,17 @@
+# depslib dependency file v1.0
+1639315111 source:d:\cpp\test\communitysearch\main.cpp
+	"lib/header.h"
+	"lib/graph.h"
+	"lib/kcore.h"
+	"lib/geometry.h"
+
+1639310265 d:\cpp\test\communitysearch\lib\header.h
+	<bits/stdc++.h>
+
+1639315977 d:\cpp\test\communitysearch\lib\graph.h
+	"header.h"
+
+1639312546 d:\cpp\test\communitysearch\lib\kcore.h
+
+1639312572 d:\cpp\test\communitysearch\lib\geometry.h
+
