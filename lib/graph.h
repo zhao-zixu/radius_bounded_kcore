@@ -174,7 +174,7 @@ public:
         }
     }
     void print_edge(){
-        for(int i=0;i<ps.size();i++){
+        for(int i=0;i<(int)ps.size();i++){
             ps[i].print();
             for(auto&x: g[i]){
                 printf("%d ",ps[x].id);
