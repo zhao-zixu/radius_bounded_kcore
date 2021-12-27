@@ -23,144 +23,131 @@ struct Point{
     }
 };
 struct Reader{
-        static const int MAX_CHAR = 1e6;
-        char buffer[MAX_CHAR];
-        FILE*f;
-        int n,i;
-        Reader(const char* file_name){
-            f = fopen(file_name,"r");
-            if(f==NULL){
-                printf("Open file failure.\n");
-                return;
-            }
-            i=0;
-            n = fread(buffer,1,MAX_CHAR,f);
+    #define NEXT_LINE -2
+    static const int MAX_CHAR = 1e6;
+    char buffer[MAX_CHAR];
+    FILE*f;
+    int n,i;
+    bool new_line;
+    Reader(const char* file_name){
+        f = fopen(file_name,"r");
+        if(f==NULL){
+            printf("Open file failure.\n");
+            return;
         }
-        inline char get_char(){
-            if(f==NULL){
+        i=0;
+        n = fread(buffer,1,MAX_CHAR,f);
+        new_line=false;
+    }
+    inline char get_char(){
+        if(f==NULL){
+            return EOF;
+        }
+        if(i<n){
+            return buffer[i++];
+        }else{
+            n = fread(buffer,1,MAX_CHAR,f);
+            i=0;
+            if(n>0){
+                return buffer[i++];
+            }
+            else {
+                fclose(f);
+                f=NULL;
                 return EOF;
             }
-            if(i<n){
-                return buffer[i++];
-            }else{
-                n = fread(buffer,1,MAX_CHAR,f);
-//                cout<<n<<endl;
-                i=0;
-                if(n>0){
-                    return buffer[i++];
-                }
-                else {
-                    fclose(f);
-                    f=NULL;
-                    return EOF;
-                }
+        }
+    }
+    inline int next_char(){
+        if(f==NULL)return EOF;
+        i++;
+        if(i>=n){
+            n = fread(buffer,1,MAX_CHAR,f);
+            i=0;
+            if(n==0){
+                fclose(f);
+                f=NULL;
+                return EOF;
             }
         }
-        template<class T> inline int RD(T &x){
-            char c;
-            while(!isdigit(c=get_char())&&ok());
-            if(!ok())return 0;
-            x=c-'0';
-            while(isdigit(c=get_char()))x=x*10+c-'0';
+        return 1;
+    }
+    int next(){
+        if(i>=n){
+            n = fread(buffer,1,MAX_CHAR,f);
+            i=0;
+            if(n==0){
+                fclose(f);
+                f=NULL;
+                return EOF;
+            }
+        }
+        if(f==NULL){
+            return EOF;
+        }
+        if(new_line){
+            new_line=false;
+            return NEXT_LINE;
+        }
+        while(!isdigit(buffer[i])&&buffer[i]!='\n'){//&&buffer[i]!='-'&&buffer[i]!='.'
+            if(next_char()==EOF)return EOF;
+        }
+        if(buffer[i]=='\n'){if(next_char()==EOF)return EOF;else return NEXT_LINE;}
+        else return 1;
+    }
+//    void out(){
+//        cout<<buffer[i]<<","<<i<<","<<n<<endl;
+//    }
+#define g (c=get_char())
+#define d isdigit(g)
+#define p x=x*10+c-'0'
+#define n x=x*10+'0'-c
+#define pp l/=10,p
+#define nn l/=10,n
+    template<class T> inline int RD(T &x){
+        int next_=next();
+        while(next_==NEXT_LINE){next_=next();}//return NEXT_LINE;
+        if(next_==EOF){return EOF;}
+        char c;while(!d);x=c-'0';while(d)p;
+        return 1;
+    }
+    template<class T> inline int RD2(T &x){
+        int next_ = next();
+        if(next_==NEXT_LINE)return NEXT_LINE;
+        else if(next_==EOF)return EOF;
+        char c;while(!d);x=c-'0';while(d)p;
+        if(c=='\n'){
+            new_line=true;
             return 1;
         }
-        template<class T> inline int RDinL(T &x){
-            char c;
-            while(!isdigit(c=get_char())&&c!='\n'&&ok());
-            if(c=='\n')return -1;
-            if(!ok())return 0;
-            x=c-'0';
-            while(isdigit(c=get_char()))x=x*10+c-'0';
-            if(c=='\n')return -1;
-            else return 1;
-        }
-        inline bool RF(double &x){
-            //scanf("%lf", &x);
-            char c;
-            while(c=get_char(),c!='-'&&c!='.'&&!isdigit(c)&&ok());
-            if(!ok())return 0;
-            if(c=='-'){
-                if((c=get_char())=='.'){
-                        x=0;
-                        double l=1;
-                        while(isdigit(c=get_char())){
-                            l/=10;
-                            x=x*10-c+'0';
-                        }
-                        x*=l;
-                }
-                else{
-                        x='0'-c;
-                        while(isdigit(c=get_char()))x=x*10-c+'0';
-                        if(c=='.'){
-                            double l=1;
-                            while(isdigit(get_char())){
-                                l/=10;
-                                x=x*10-c+'0';
-                            }
-                            x*=l;
-                        }
-                }
-            }
-            else if(c=='.'){
-                x=0;
-                double l=1;
-                while(isdigit(c=get_char())){
-                    l/=10;
-                    x=x*10+c-'0';
+        return 1;
+    }
+    template<class T> inline int RDD(T &x){
+        char c;while(g,c!='-'&&!isdigit(c));
+        if (c=='-'){x='0'-g;while(d)n;}
+        else{x=c-'0';while(d)p;}
+        return 1;
+    }
+    inline int RF(double &x){
+        int next_ = next();
+        if(next_==NEXT_LINE)return NEXT_LINE;
+        else if(next_==EOF)return EOF;
+        //scanf("%lf", &x);
+        char c;while(g,c!='-'&&c!='.'&&!isdigit(c));
+        if(c=='-')if(g=='.'){x=0;double l=1;while(d)nn;x*=l;}
+            else{x='0'-c;while(d)n;if(c=='.'){double l=1;while(d)nn;x*=l;}}
+        else if(c=='.'){x=0;double l=1;while(d)pp;x*=l;}
+            else{x=c-'0';while(d)p;if(c=='.'){double l=1;while(d)pp;x*=l;}}
+        return 1;
+    }
+#undef nn
+#undef pp
+#undef n
+#undef p
+#undef d
+#undef g
 
-                };
-                x*=l;
-            }
-            else{
-                x=c-'0';
-                while(isdigit(c=get_char())){
-                    x=x*10+c-'0';
-                }
-                if(c=='.'){
-                    double l=1;
-                    while(isdigit(c=get_char())){
-                        l/=10;
-                        x=x*10+c-'0';
-                    }
-                    x*=l;
-                }
-            }
-            return 1;
-        }
-        bool ok(){
-            if(f==NULL)return false;
-            while(!isdigit(buffer[i])&&buffer[i]!='.'&&buffer[i]!='-'){
-                if(i<n)i++;
-                else {
-                    n = fread(buffer,1,MAX_CHAR,f);
-                    if(n>0)i=0;
-                    else{
-                        f=NULL;
-                        return false;
-                    }
-                }
-            }
-            return true;
-        }
-        bool next_line(){
-            if(f==NULL)return true;
-            while(!isdigit(buffer[i])&&buffer[i]!='.'&&buffer[i]!='-'&&buffer[i]!='\n'){
-                if(i<n)i++;
-                else {
-                    n = fread(buffer,1,MAX_CHAR,f);
-                    if(n>0)i=0;
-                    else{
-                        f=NULL;
-                        return true;
-                    }
-                }
-            }
-            if(buffer[i]=='\n')return true;
-            else return false;
-        }
 };
-
 template <class Point> struct graph{
 public:
     graph(): _n(0) {}
@@ -230,12 +217,10 @@ public:
 
     void read_pos(const char* file_name){
         Reader reader(file_name);
-        while(reader.ok()){
-            int id=0;
+        int id=0;
+        while(reader.RD(id)==1){
             double x=0,y=0;
-            reader.RD(id);
-            reader.RF(x);
-            reader.RF(y);
+            reader.RF(x),reader.RF(y);
             Point p(x,y,id);
             add_point(p);
         }
@@ -244,13 +229,12 @@ public:
     }
     void read_edge(const char* file_name){
         Reader reader(file_name);
-        while(reader.ok()){
-            int u=0,v=0;
-            reader.RD(id);
-            reader.RF(x);
-            reader.RF(y);
-            Point p(x,y,id);
-            add_point(p);
+        int id=0;
+        while(reader.RD(id)==1){
+            int e;
+            while(reader.RD2(e)==1){
+                add_edge(id-1,e-1);
+            }
         }
     }
     graph* gen_sub_graph(vector<int> id){
