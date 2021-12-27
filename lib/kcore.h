@@ -29,13 +29,14 @@ public:
         }
         compute_core();
     }
-//    kcore(graph<Point> gra, vector<int> ids){
-//        this->kcore(gra);
-////        kcore(*g.gen_sub_graph(ids));
-//    }
-    //compute the core number of each point
+
     int get_maxk(){
-        //seg_tree
+        //can be optimized using seg_tree later
+        int maxk=0;
+        auto&ps=g.get_point_set();
+        for(auto&p:ps){
+            maxk=max(maxk,p.core);
+        }
         return maxk;
     }
     void print(){
@@ -57,39 +58,156 @@ public:
             it++;
         }
     }
-    void add_point(){
-        ;
+    // add a new point to graph
+    void add_point(int id, const vector<int>&e){
+        assert(!g.include_id(id));
+        KcPoint p(id);
+        add_point(p,e);
     }
-    void del_point(){
-        ;
+    void add_point(KcPoint p,const vector<int>&e){
+        g.add_point(p);
+        int num=g.get_num(p.id);
+        for(auto&v: e){
+            if(g.include_id(v)){
+                insert_edge(num,g.get_num(v));
+            }
+        }
     }
+    void del_point(int id){
+        if(g.get_point(id).del)return;
+        int nid = g.get_num(id);
+        auto& edges = g.get_edge_set();
+        int n=edges[nid].size();
+        for(int i=n-1;i>=0;i--){
+            del_edge(nid,edges[nid][i]);
+        }
+        g[nid].id=-1;
+        g.erase(id);
+//        for(auto& x:edges[nid]){
+//            out(nid,x);
+//            del_edge(nid,x);
+//            out(nid,x);
+//            print_edge();
+//            cout<<"--------"<<endl;
+//        }
+//        g.del_point(id);
+    }
+    typedef unordered_map<int,int> VC;
     void insert_edge(int from,int to){
-
+        assert(0<=from&&from<(int)g.size());
+        assert(0<=to&&to<(int)g.size());
+        g.add_edge(from,to);
+        int c,p;
+        if(g[from].core<g[to].core){
+            c=g[from].core;
+            p=from;
+        }else {
+            c=g[to].core;
+            p=to;
+        }
+        VC s;
+        vector<bool> vis(g.size(),0);
+        color(p,c,s,vis);
+        recolor_insert(c,s);
+        update_insert(c,s);
     }
     void del_edge(int from, int to){
+        g.del_edge(from,to);
+        int c,p;
+        if(g[from].core<g[to].core){
+            c=g[from].core;
+            p=from;
+        }else {
+            c=g[to].core;
+            p=to;
+        }
+        VC s;
+        vector<bool> vis(g.size(),0);
+        color(p,c,s,vis);
+        if(g[from].core==g[to].core){
+            fill(vis.begin(),vis.end(),false);
+            color(from,c,s,vis);
+        }
+        recolor_del(c,s);
+        update_del(c,s);
     }
-
+    bool include(int id){
+        return g.include_id(id);
+    }
 private:
-    void color(){
-
+    void color(int u, int c, VC&s, vector<bool>& vis){
+        vis[u]=1;
+        s.insert(make_pair(u,1));
+        auto&edge = g.get_edge_set();
+        for(auto v:edge[u]){
+            if(!vis[v]&&g[v].core==c){
+                color(v,c,s,vis);
+            }
+            vis[v]=true;
+        }
     }
-    void recolor_insert(){
-
+    void recolor_insert(int c, VC&s){
+        bool flag=false;
+        auto& edge=g.get_edge_set();
+        for(auto&x: s){
+            if(x.second==1){
+                int xu=0;
+                for(auto&v:edge[x.first]){
+                    if(g[v].core>c||(s.count(v)==1&&s[v]==1)){
+                        xu++;
+                    }
+                }
+                if(xu<=c){
+                    x.second=0;
+                    flag=true;
+                }
+            }
+        }
+        if(flag==true)recolor_insert(c, s);
     }
-    void update_insert(){
-
+    void update_insert(int c, VC&s){
+        for(auto& x: s){
+            if(x.second==1){
+                g[x.first].core++;
+            }
+        }
     }
-    void recolor_del(){
+    void recolor_del(int c, VC& s){
+        bool flag=false;
+        auto& edge = g.get_edge_set();
+        for(auto&x:s){
+            if(x.second==1){
+                int xu=0;
+                for(auto&v:edge[x.first]){
+                    if(g[v].core>c||(s.count(v)==1&&s[v]==1)){
+                        xu++;
+                    }
+                }
+                if(xu<c){
+                    x.second=0;
+                    flag=true;
+                }
+            }
+        }
+        if(flag){
+            recolor_del(c,s);
+        }
     }
-    void update_del(){
-
+    void update_del(int c, VC& s){
+        for(auto x: s){
+            if(x.second==0){
+                g[x.first].core--;
+            }
+        }
     }
+public:
+    //compute the core number of each point
     void compute_core(){
         int max_deg=g.get_max_degree();
 
 
         //initialize the k class
-        vector<set<int> > kclass(max_deg+1);
+        vector<unordered_set<int> > kclass(max_deg+1);
         vector<KcPoint>&ps=g.get_point_set();
         auto&e = g.get_edge_set();
         vector<int> deg(e.size());
@@ -106,7 +224,7 @@ private:
         // do the k-core decomposition
         for(int i=1;i<=max_deg;i++){
             while(!kclass[i].empty()){
-                set<int>::iterator it = kclass[i].begin();
+                unordered_set<int>::iterator it = kclass[i].begin();
                 assert(it!=kclass[i].end());
 //                assert(it!=NULL);
                 int num=*it;
@@ -130,7 +248,7 @@ private:
         }
 
     }
-
+private:
     graph<KcPoint> g;
     int maxk;
 };

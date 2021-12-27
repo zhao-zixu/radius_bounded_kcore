@@ -14,7 +14,7 @@ struct Point{
         double dx=x-p.x,dy=y-p.y;
         return sqrt(dx*dx+dy*dy);
     }
-    bool withinDis(Point p, double d){
+    bool within_dis(Point p, double d){
         return getDis(p)<=d;
     }
     double getPolarAngle(Point p){
@@ -22,7 +22,144 @@ struct Point{
         return atan2(dy,dx);
     }
 };
+struct Reader{
+        static const int MAX_CHAR = 1e6;
+        char buffer[MAX_CHAR];
+        FILE*f;
+        int n,i;
+        Reader(const char* file_name){
+            f = fopen(file_name,"r");
+            if(f==NULL){
+                printf("Open file failure.\n");
+                return;
+            }
+            i=0;
+            n = fread(buffer,1,MAX_CHAR,f);
+        }
+        inline char get_char(){
+            if(f==NULL){
+                return EOF;
+            }
+            if(i<n){
+                return buffer[i++];
+            }else{
+                n = fread(buffer,1,MAX_CHAR,f);
+//                cout<<n<<endl;
+                i=0;
+                if(n>0){
+                    return buffer[i++];
+                }
+                else {
+                    fclose(f);
+                    f=NULL;
+                    return EOF;
+                }
+            }
+        }
+        template<class T> inline int RD(T &x){
+            char c;
+            while(!isdigit(c=get_char())&&ok());
+            if(!ok())return 0;
+            x=c-'0';
+            while(isdigit(c=get_char()))x=x*10+c-'0';
+            return 1;
+        }
+        template<class T> inline int RDinL(T &x){
+            char c;
+            while(!isdigit(c=get_char())&&c!='\n'&&ok());
+            if(c=='\n')return -1;
+            if(!ok())return 0;
+            x=c-'0';
+            while(isdigit(c=get_char()))x=x*10+c-'0';
+            if(c=='\n')return -1;
+            else return 1;
+        }
+        inline bool RF(double &x){
+            //scanf("%lf", &x);
+            char c;
+            while(c=get_char(),c!='-'&&c!='.'&&!isdigit(c)&&ok());
+            if(!ok())return 0;
+            if(c=='-'){
+                if((c=get_char())=='.'){
+                        x=0;
+                        double l=1;
+                        while(isdigit(c=get_char())){
+                            l/=10;
+                            x=x*10-c+'0';
+                        }
+                        x*=l;
+                }
+                else{
+                        x='0'-c;
+                        while(isdigit(c=get_char()))x=x*10-c+'0';
+                        if(c=='.'){
+                            double l=1;
+                            while(isdigit(get_char())){
+                                l/=10;
+                                x=x*10-c+'0';
+                            }
+                            x*=l;
+                        }
+                }
+            }
+            else if(c=='.'){
+                x=0;
+                double l=1;
+                while(isdigit(c=get_char())){
+                    l/=10;
+                    x=x*10+c-'0';
 
+                };
+                x*=l;
+            }
+            else{
+                x=c-'0';
+                while(isdigit(c=get_char())){
+                    x=x*10+c-'0';
+                }
+                if(c=='.'){
+                    double l=1;
+                    while(isdigit(c=get_char())){
+                        l/=10;
+                        x=x*10+c-'0';
+                    }
+                    x*=l;
+                }
+            }
+            return 1;
+        }
+        bool ok(){
+            if(f==NULL)return false;
+            while(!isdigit(buffer[i])&&buffer[i]!='.'&&buffer[i]!='-'){
+                if(i<n)i++;
+                else {
+                    n = fread(buffer,1,MAX_CHAR,f);
+                    if(n>0)i=0;
+                    else{
+                        f=NULL;
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+        bool next_line(){
+            if(f==NULL)return true;
+            while(!isdigit(buffer[i])&&buffer[i]!='.'&&buffer[i]!='-'&&buffer[i]!='\n'){
+                if(i<n)i++;
+                else {
+                    n = fread(buffer,1,MAX_CHAR,f);
+                    if(n>0)i=0;
+                    else{
+                        f=NULL;
+                        return true;
+                    }
+                }
+            }
+            if(buffer[i]=='\n')return true;
+            else return false;
+        }
+};
 
 template <class Point> struct graph{
 public:
@@ -89,6 +226,33 @@ public:
         }
         fclose(f);
     }
+
+
+    void read_pos(const char* file_name){
+        Reader reader(file_name);
+        while(reader.ok()){
+            int id=0;
+            double x=0,y=0;
+            reader.RD(id);
+            reader.RF(x);
+            reader.RF(y);
+            Point p(x,y,id);
+            add_point(p);
+        }
+        _n=ps.size();
+        g=vector<vector<int> >(_n);
+    }
+    void read_edge(const char* file_name){
+        Reader reader(file_name);
+        while(reader.ok()){
+            int u=0,v=0;
+            reader.RD(id);
+            reader.RF(x);
+            reader.RF(y);
+            Point p(x,y,id);
+            add_point(p);
+        }
+    }
     graph* gen_sub_graph(vector<int> id){
         #ifndef NDEBUG
         for(auto&x: id){
@@ -118,6 +282,12 @@ public:
         }
         return gen_sub_graph(v);
     }
+    graph* clone(){
+        graph* ng = new graph();
+        ng.num=num;
+        ng.ps=ps;
+        ng.g=g;
+    }
     void printEdge(){
         int n=g.size();
         for(int i=0;i<n;i++){
@@ -145,14 +315,42 @@ public:
     }
 
     int add_edge(int from, int to){
-        assert(num.count(from)!=0);
-        assert(num.count(to)!=0);
-        from=num[from],to=num[to];
+//        assert(num.count(from)!=0);
+//        assert(num.count(to)!=0);
+//        from=num[from],to=num[to];
+        assert(0<=from&&from<(int)ps.size());
+        assert(0<=to&&to<(int)ps.size());
         g[from].push_back(to);
         g[to].push_back(from);
         return 0;
     }
+    void del_point(int id){
+        assert(num.count(id)!=0);
+        int nid = num[id];
+        for(auto&x:g[nid]){
+            del_edge(nid,x);
+        }
 
+    }
+    void del_edge(int from,int to){
+        assert(0<=from&&from<(int)ps.size());
+        assert(0<=to&&to<(int)ps.size());
+
+        for(auto&x:g[from]){
+            if(x==to){
+                swap(x,*g[from].rbegin());
+                g[from].pop_back();
+                break;
+            }
+        }
+        for(auto&x:g[to]){
+            if(x==from){
+                swap(x,*g[to].rbegin());
+                g[to].pop_back();
+                break;
+            }
+        }
+    }
     Point& get_point(int id){
         assert(num.count(id)!=0);
         return ps[num[id]];
@@ -167,6 +365,14 @@ public:
     vector<int>& get_edge(int id){
         assert(num.count(id)!=0);
         return g[num[id]];
+    }
+    vector<int> gen_edge_id(int num){
+        assert(0<=num&&num<(int)ps.size());
+        vector<int> e;
+        for(auto v:g[num]){
+            e.push_back(ps[v].id);
+        }
+        return e;
     }
     void print_all_point(){
         for(auto&x:ps){
@@ -193,8 +399,15 @@ public:
     int size(){
         return ps.size();
     }
+    int get_num(int id){
+        assert(num.count(id)!=0);
+        return num[id];
+    }
     bool include_id(int id){
         return num.count(id)!=0;
+    }
+    bool include_num(int num){
+        return 0<=num&&num<ps.size();
     }
     vector<int> get_ids(){
         vector<int> ids;
@@ -208,6 +421,13 @@ public:
     }
     vector< vector<int> >& get_edge_set(){
         return g;
+    }
+    Point& operator[](int i){
+        assert(0<=i&&i<(int)ps.size());
+        return ps[i];
+    }
+    void erase(int i){
+        num.erase(i);
     }
 private:
     int _n;
