@@ -9,7 +9,7 @@
 class rotc{
 public:
     rotc(){}
-    rotc(graph<Point> & gra):g(gra){}
+    rotc(Graph<Point> & gra):g(gra){}
     vector<circle>& query(int k, double r, int id){
         //store the circles which satisfy the query condition
         vector<circle>& res = *(new vector<circle>());
@@ -33,6 +33,16 @@ public:
 
         //bin-search the first set satisfy k-core
 
+        int l=0;r=ps.size()-1;
+        while(l<=r){
+            int mid = (l+r)/2;
+            if(true){
+                r = mid - 1;
+            }else {
+                l = mid + 1;
+            }
+
+        }
 
         //judge k-core in increasing order
         kcore kc;
@@ -59,7 +69,7 @@ public:
         return res;
     }
 private:
-    graph<Point> g;
+    Graph<Point> g;
 };
 
 #endif // ROTC_H_INCLUDED

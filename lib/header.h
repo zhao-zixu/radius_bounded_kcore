@@ -1,6 +1,6 @@
 #ifndef HEADER_H_INCLUDED
 #define HEADER_H_INCLUDED
-#include "atcoder/segtree"
+//#include "atcoder/segtree"
 
 #include <bits/stdc++.h>
 using namespace std;
@@ -19,22 +19,53 @@ typedef vector<VL> VVL;
 typedef pair<int,int> PII;
 typedef pair<ll,ll> PLL;
 
-#define printv(v) {for(auto&x:v){cout<<x<<",";}cout<<endl;}
-#define printvv(vv) for(auto&y:vv){printv(y);cout<<endl;}cout<<endl;
-inline void out(auto a){cout<<a<<endl;}
-inline void out(auto a,auto b){cout<<a<<","<<b<<endl;}
-inline void out(auto a,auto b,auto c){cout<<a<<","<<b<<","<<c<<endl;}
+typedef complex<double> P;
+#define X()  real()
+#define Y()  imag()
+
+void __print(int x) {cerr << x;}
+void __print(long x) {cerr << x;}
+void __print(long long x) {cerr << x;}
+void __print(unsigned x) {cerr << x;}
+void __print(unsigned long x) {cerr << x;}
+void __print(unsigned long long x) {cerr << x;}
+void __print(float x) {cerr << x;}
+void __print(double x) {cerr << x;}
+void __print(long double x) {cerr << x;}
+void __print(char x) {cerr << '\'' << x << '\'';}
+void __print(const char *x) {cerr << '\"' << x << '\"';}
+void __print(const string &x) {cerr << '\"' << x << '\"';}
+void __print(bool x) {cerr << (x ? "true" : "false");}
+void __print(P x) {cerr<<"("<<x.X()<<","<<x.Y()<<")";}
+
+template<typename T, typename V>
+void __print(const pair<T, V> &x) {cerr << '{'; __print(x.first); cerr << ','; __print(x.second); cerr << '}';}
+template<typename T>
+void __print(const T &x) {int f = 0; cerr << '{'; for (auto &i: x) cerr << (f++ ? "," : ""), __print(i); cerr << "}";}
+void _print() {cerr << "]\n";}
+template <typename T, typename... V>
+void _print(T t, V... v) {__print(t); if (sizeof...(v)) cerr << ", "; _print(v...);}
+#ifndef NDEBUG
+#define dbg(x...) cerr << "[" << #x << "] = ["; _print(x)
+#else
+#define dbg(x...)
+#endif
 
 template<class T> inline T min(T a, T b, T c){return min(min(a, b), c);}
 
-clock_t startTime;
+clock_t startTime,lastTime;
+double getLastTime() {
+    double ret = (double)(clock() - lastTime) / CLOCKS_PER_SEC;
+    lastTime = clock();
+	return ret;
+}
 double getCurrentTime() {
 	return (double)(clock() - startTime) / CLOCKS_PER_SEC;
 }
 void time(){
-    cout<<"Time:"<<getCurrentTime()<<endl;
+    cerr<<"Time:"<<getCurrentTime()<<endl;
 }
 void time(string s){
-    cout<<s<<" Time:"<<getCurrentTime()<<endl;
+    cerr<<s<<" Time:"<<getCurrentTime()<<endl;
 }
 #endif // HEADER_H_INCLUDED

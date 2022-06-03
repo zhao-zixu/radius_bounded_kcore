@@ -148,10 +148,10 @@ struct Reader{
 #undef g
 
 };
-template <class Point> struct graph{
+template <class Point> struct Graph{
 public:
-    graph(): _n(0) {}
-    graph(int n) : _n(n), g(n) {}
+    Graph(): _n(0) {}
+    Graph(int n) : _n(n), g(n) {}
 
     void readPos(const char* file_name){
         const int MAX_CHAR_EACH_LINE = 1e5;
@@ -237,14 +237,14 @@ public:
             }
         }
     }
-    graph* gen_sub_graph(vector<int> id){
+    Graph* gen_sub_graph(vector<int> id){
         #ifndef NDEBUG
         for(auto&x: id){
             assert(num.count(x)!=0);
         }
         #endif // NEDBUG
         set<int> sid(id.begin(),id.end());
-        graph* g=new graph<Point>();
+        Graph* g=new Graph<Point>();
         for(auto&x:sid){
             Point p=ps[num[x]];
             g->ps.push_back(p);
@@ -259,15 +259,15 @@ public:
         }
         return g;
     }
-    graph* gen_sub_graph(int start_,int end_){
+    Graph* gen_sub_graph(int start_,int end_){
         vector<int> v;
         for(int i=start_;i<=end_;i++){
             v.push_back(i);
         }
         return gen_sub_graph(v);
     }
-    graph* clone(){
-        graph* ng = new graph();
+    Graph* clone(){
+        Graph* ng = new Graph();
         ng.num=num;
         ng.ps=ps;
         ng.g=g;
@@ -278,7 +278,7 @@ public:
             printf("ID: %d ",ps[i].id);
             printf("Edge: ");
             for(auto x: g[i]){
-                printf("%d ",x);
+                printf("%d ",x + 1);
             }
             printf("\n");
         }
@@ -421,5 +421,7 @@ private:
     vector< vector<int> > g;
 };
 
-
+template <class Point> struct AttributeGraph : public Graph{
+    ;
+};
 #endif // GRAPH_H_INCLUDED

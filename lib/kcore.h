@@ -19,7 +19,7 @@ public:
 class kcore{
 public:
     kcore(){}
-    kcore(graph<Point> gra){
+    kcore(Graph<Point> gra){
         vector<int> ids = gra.get_ids();
         for(auto&i:ids){
             Point p = gra.get_point(i);
@@ -249,7 +249,7 @@ public:
 
     }
 private:
-    graph<KcPoint> g;
+    Graph<KcPoint> g;
     int maxk;
 };
 
