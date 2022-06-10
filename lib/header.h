@@ -1,6 +1,6 @@
 #ifndef HEADER_H_INCLUDED
 #define HEADER_H_INCLUDED
-#include "atcoder/segtree"
+//#include "atcoder/segtree"
 
 #include <bits/stdc++.h>
 using namespace std;

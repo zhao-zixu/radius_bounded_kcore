@@ -11,10 +11,14 @@ const string DATA_PATH[][2] = {
 
 void test(){
     graph<Point> g;
-    string path[2]=DATA_PATH[1];
+    const string* path = DATA_PATH[1];
     g.readPos(path[0].c_str());
     g.readEdge(path[1].c_str());
-    kcore kc;
+    g.printEdge();
+    g.print_all_point();
+    kcore kc(g);
+    kc.print();
+
 }
 
 int main(){
