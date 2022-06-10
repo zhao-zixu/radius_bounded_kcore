@@ -5,7 +5,8 @@
 #include "lib/kcore.h"
 #include "lib/geometry.h"
 
-const string DATA_PATH[][2] = {
+//const
+string DATA_PATH[][2] = {
     {"./data/location.txt", "./data/edge.txt"},
     {"./data/location.txt", "./data/edge2.txt"},
     {"./data/foursquare-location2","./data/foursquare-graph"},
@@ -13,7 +14,9 @@ const string DATA_PATH[][2] = {
 
 void testReadData(){
     graph<Point> g;
-    string path[2]=DATA_PATH[0];
+//    string path[2];
+//    path = DATA_PATH[0];
+    string path[2] = {DATA_PATH[0][0],DATA_PATH[0][1]};
     g.readPos(path[0].c_str());
     g.readEdge(path[1].c_str());
     cout<<"read data successfully"<<endl;
@@ -31,7 +34,7 @@ void testReadData(){
 }
 void testGenSubGraph(){
     graph<Point> g;
-    string path[2]=DATA_PATH[2];
+    string path[2] = {DATA_PATH[0][0],DATA_PATH[0][1]};
     g.readPos(path[0].c_str());
     g.readEdge(path[1].c_str());
     cout<<"read data successfully"<<endl;
@@ -49,7 +52,8 @@ void testGenSubGraph(){
 }
 void testKCore(){
     graph<Point> g;
-    string path[2]=DATA_PATH[0];
+    string path[2] = {DATA_PATH[0][0],DATA_PATH[0][1]};
+//    cout<<path[0]<<endl<<path[1]<<endl;
     g.readPos(path[0].c_str());
     g.readEdge(path[1].c_str());
     kcore kc(*g.gen_sub_graph(1,10));
