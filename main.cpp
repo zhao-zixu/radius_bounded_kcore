@@ -10,12 +10,12 @@ const string DATA_PATH[][2] = {
 };
 
 void test(){
-    graph<Point> g;
-<<<<<<< HEAD
+    Graph<Point> g;
+
     const string* path = DATA_PATH[1];
-=======
-    string path[2] = {DATA_PATH[1][0],DATA_PATH[1][1]};
->>>>>>> ef4f64ee0627b9b8ea428f74a02348d2e4b9eab5
+
+//    string path[2] = {DATA_PATH[1][0],DATA_PATH[1][1]};
+
     g.readPos(path[0].c_str());
     g.readEdge(path[1].c_str());
     g.printEdge();

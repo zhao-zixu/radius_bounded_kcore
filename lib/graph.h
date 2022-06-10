@@ -421,7 +421,7 @@ private:
     vector< vector<int> > g;
 };
 
-template <class Point> struct AttributeGraph : public Graph{
-    ;
-};
+//template <class Point> struct AttributeGraph : public Graph{
+//    ;
+//};
 #endif // GRAPH_H_INCLUDED
